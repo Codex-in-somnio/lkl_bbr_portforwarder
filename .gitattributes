@@ -1,0 +1,10 @@
+Makefile.in linguist-generated=true
+aclocal.m4 linguist-generated=true
+compile linguist-generated=true
+configure linguist-generated=true
+configure.ac linguist-generated=true
+depcomp linguist-generated=true
+example.cfg linguist-generated=true
+install-sh linguist-generated=true
+missing linguist-generated=true
+src/Makefile.in linguist-generated=true
