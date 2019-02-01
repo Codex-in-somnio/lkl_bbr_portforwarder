@@ -196,6 +196,18 @@ void *ip_forwarder(void *args)
 			write_buffer_length = n_read - 14;
 			write_buffer = read_buffer + 14;
 			
+			uint16_t checksum_orig = (read_buffer[hdr_len_out + 16 + 14] << 8) | read_buffer[hdr_len_out + 17 + 14];
+			recalc_checksum(read_buffer + 14, n_read - 14, hdr_len_out, ipv6);
+			uint16_t checksum_calculated = (read_buffer[hdr_len_out + 16 + 14] << 8) | read_buffer[hdr_len_out + 17 + 14];
+			bool bad_checksum = false;
+			if (checksum_calculated != checksum_orig)
+			{
+				printf("orig: %04x, actual: %04x", checksum_orig, checksum_calculated);
+				error("Outgoing TCP checksum failed. Packet droped.", false);
+				print_hex(read_buffer, n_read);
+				continue;
+			}
+			
 			if (ipv6)
 			{
 				memcpy(outgoing_src_addr6, &host_addr6, 16);
@@ -214,6 +226,18 @@ void *ip_forwarder(void *args)
 		{
 			write_buffer_length = n_read + 14;
 			write_buffer = read_buffer - 14;
+			
+			uint16_t checksum_orig = (read_buffer[hdr_len_in + 16] << 8) | read_buffer[hdr_len_in + 17];
+			recalc_checksum(read_buffer, n_read, hdr_len_in, ipv6);
+			uint16_t checksum_calculated = (read_buffer[hdr_len_in + 16] << 8) | read_buffer[hdr_len_in + 17];
+			bool bad_checksum = false;
+			if (checksum_calculated != checksum_orig)
+			{
+				printf("orig: %04x, actual: %04x", checksum_orig, checksum_calculated);
+				error("Incoming TCP checksum failed. Packet droped.", false);
+				print_hex(read_buffer, n_read);
+				continue;
+			}
 			
 			if (ipv6)
 			{

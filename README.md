@@ -98,6 +98,14 @@ net.ipv6.conf.all.forwarding=1
 ## 关于iptables配置
 根据配置文件的设置，LKL BBR Portforwarder会自动添加需要的iptables规则，并在退出时自动删除，正常情况下无需额外配置。
 
+## Checksum offload可能对内置转发器产生影响
+在使用内置转发器时，如果出现大量checksum有误导致数据包被丢弃的情况，请尝试关闭网卡的checksum offload。网卡的checksum offload可能会导致软件收到的数据包中的checksum和实际收到的不同。
+
+用`ethtool`关闭checksum offload的方法：
+```
+ethtool --offload <网卡> rx off tx off
+```
+
 ## 注意事项
 * 使用`set_ip(6)tables_nat`或`enable_ip(6)_forwarder`均为默认允许所有来源，并且不经过iptables的INPUT链。
 * 这是一个玩具项目，不要在任何生产环境使用。
